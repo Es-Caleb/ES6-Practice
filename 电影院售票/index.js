@@ -4,8 +4,7 @@ class Cinema {
         this.y = 10;
         this.cinema = [];
         this.status = 0;
-        this.a = 0;
-        this.b = 0;
+        this.movieTicketRecords = [];
     }
     init(x,y) {
         this.x = x;
@@ -15,25 +14,39 @@ class Cinema {
             this.cinema.push(zuowei);
         }
     }
-    // 购票
-    buyTicket(a,b) {
-        this.a = a;
-        this.b = b;
+    // 保存座位
+    saveLocation(a,b, status) {
+        this.getTime();
+        let arr = {
+            row: a,
+            column: b,
+            time: this.times,
+            status: status
+        };
+        this.movieTicketRecords.push(arr);
+    }
+    // 座位不存在
+    nonExistent(a,b) {
         if ( a <= 0 || a > this.x || b <= 0 || b > this.y ) {
+            this.status = 2;
             console.log('不存在该座位');
             return;
         }
+    }
+    // 购票
+    sell(a,b) {
+        this.nonExistent(a,b);
+        this.saveLocation(a,b,0);
         this.cinema[a-1][b-1] = 'X';
-        this.status = 0;
     }
     // 退票
     refund(a,b) {
-        this.a = a;
-        this.b = b;
+        this.nonExistent(a,b);
         if (this.cinema[a-1][b-1] == 'X') {
+            this.saveLocation(a,b,1);
             this.cinema[a-1][b-1] = 'O';
-            this.status = 1;
         } else {
+            this.status = 2;
             console.log('该座位未售出');
         }
     }
@@ -45,23 +58,33 @@ class Cinema {
         console.log(this.buys);
     }
     listorder() {
+        if (this.status == 2) {
+            return;
+        }
+        for (let i = 0; i < this.movieTicketRecords.length; i++) {
+            let url = this.movieTicketRecords[i].time + ' row ' + this.movieTicketRecords[i].row + ' column ' + this.movieTicketRecords[i].column;
+            if (this.movieTicketRecords[i].status == 0) {
+                console.log(url);
+            } else {
+                console.log(url + ' refund');
+            }
+        }
+    }
+
+    // 获取当前时间
+    getTime() {
         let date = new Date();
         let year = date.getFullYear() + '-';
         let month = date.getMonth() + 1 + '-';
         let day = date.getDate() + ' ';
         let time = date.toLocaleTimeString('chinese', {hour12: false});
-        
-        let url = year + month + day + time + ' row ' + this.a + ' column ' + this.b;
-        if (this.status == 0) {
-            console.log(url);
-        } else {
-            console.log(url + ' refund');
-        }
+        this.times = year + month + day + time;
     }
+    
 }
 var arr = new Cinema();
-arr.init(5,10);
-arr.buyTicket(4,6);
+arr.init(5, 10);
+arr.sell(4,6);
 arr.print();
 arr.listorder();
 arr.refund(4,6);
