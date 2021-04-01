@@ -4,6 +4,7 @@ class Cinema {
         this.y = 10;
         this.cinema = [];
         this.movieTicketRecords = [];
+        this.status = 0;
     }
     init(x,y) {
         this.x = x;
@@ -28,18 +29,27 @@ class Cinema {
     nonExistent(a,b) {
         if ( a <= 0 || a > this.x || b <= 0 || b > this.y ) {
             console.log('不存在该座位');
-            return;
+            this.status = 2;
         }
     }
     // 购票
     sell(a,b) {
         this.nonExistent(a,b);
-        this.saveLocation(a,b,0);
-        this.cinema[a-1][b-1] = 'X';
+        if (this.status == 0) {
+            this.saveLocation(a,b,0);
+            this.cinema[a-1][b-1] = 'X';
+        } else {
+            this.status = 0;
+        }
+        
     }
     // 退票
     refund(a,b) {
         this.nonExistent(a,b);
+        if (this.status == 2) {
+            this.status = 0;
+            return;
+        }
         if (this.cinema[a-1][b-1] == 'X') {
             this.saveLocation(a,b,1);
             this.cinema[a-1][b-1] = 'O';
@@ -73,7 +83,6 @@ class Cinema {
         let time = date.toLocaleTimeString('chinese', {hour12: false});
         this.times = year + month + day + time;
     }
-    
 }
 var arr = new Cinema();
 arr.init(5, 10);
