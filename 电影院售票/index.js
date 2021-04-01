@@ -1,6 +1,15 @@
 function isNumber(num) {
   return Object.prototype.toString.call(num) === "[object Number]";
 }
+// 获取当前时间
+function getTime() {
+    let date = new Date();
+    let year = date.getFullYear() + '-';
+    let month = date.getMonth() + 1 + '-';
+    let day = date.getDate() + ' ';
+    let time = date.toLocaleTimeString('chinese', {hour12: false});
+    return year + month + day + time;
+}
 class Cinema {
     constructor() {
         // 座位排
@@ -30,11 +39,10 @@ class Cinema {
      * status 是否出售 0售出 1退票
      */
     saveLocation(a,b, status) {
-        this.getTime();
         let arr = {
             row: a,
             col: b,
-            time: this.times,
+            time: getTime(),
             status
         };
         this.record.push(arr);
@@ -75,21 +83,11 @@ class Cinema {
             console.log(`${item.time} row ${item.row} column ${item.col} ${item.status === 1 ? 'refund' : '' }`)
         })
     }
-    // 获取当前时间
-    getTime() {
-        let date = new Date();
-        let year = date.getFullYear() + '-';
-        let month = date.getMonth() + 1 + '-';
-        let day = date.getDate() + ' ';
-        let time = date.toLocaleTimeString('chinese', {hour12: false});
-        this.times = year + month + day + time;
-    }
 }
 var sell = new Cinema();
 sell.init(5, 10);
 console.log('第1波测试：测试有效的座位号\n');
 sell.sell(6, 10);
-
 
 console.log('\n第2波测试：重复售出座位号\n');
 sell.sell(2, 3);
