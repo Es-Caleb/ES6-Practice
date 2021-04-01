@@ -1,78 +1,79 @@
+function isNumber(num) {
+  return Object.prototype.toString.call(num) === "[object Number]";
+}
 class Cinema {
     constructor() {
-        this.x = 5;
-        this.y = 10;
+        // 座位排
+        this.row = 0;
+        // 座位列
+        this.col = 0;
+        // 座位情况
         this.cinema = [];
-        this.movieTicketRecords = [];
-        this.status = 0;
+        // 售票记录
+        this.record = [];
     }
     init(x,y) {
-        this.x = x;
-        this.y = y;
-        for(let i = 0; i < x; i++){
-            let zuowei = new Array(y).fill('O');
-            this.cinema.push(zuowei);
+        if (isNumber(x) && isNumber(y) && x > 0 && y > 0) {
+            this.row = x;
+            this.col = y;
+            this.cinema = new Array(x)
+            .fill("")
+            .map(() => new Array(y).fill("O"));
+        } else {
+            console.log("请输入有效的座位排数");
         }
     }
-    // 保存座位
+    /** 保存座位
+     * row  排数
+     * col  列数
+     * time 记录时间
+     * status 是否出售 0售出 1退票
+     */
     saveLocation(a,b, status) {
         this.getTime();
         let arr = {
             row: a,
-            column: b,
+            col: b,
             time: this.times,
-            status: status
+            status
         };
-        this.movieTicketRecords.push(arr);
+        this.record.push(arr);
     }
     // 座位不存在
     nonExistent(a,b) {
-        if ( a <= 0 || a > this.x || b <= 0 || b > this.y ) {
-            console.log('不存在该座位');
-            this.status = 2;
+        if (isNumber(a) && isNumber(b) && a > 0 && b > 0 && a < this.row && b < this.col) {
+            return true;
         }
+        console.log("请输入有效的座位号");
+        return false;
     }
     // 购票
-    sell(a,b) {
-        this.nonExistent(a,b);
-        if (this.status == 0) {
-            this.saveLocation(a,b,0);
-            this.cinema[a-1][b-1] = 'X';
+    sell(row, col) {
+        if (!this.nonExistent(row, col)) return;
+        if (this.cinema[row-1][col-1] == 'O') {
+            this.cinema[row-1][col-1] = 'X';
+            this.saveLocation(row,col,0);
         } else {
-            this.status = 0;
+            console.log("该座位已售出");
         }
-        
     }
     // 退票
-    refund(a,b) {
-        this.nonExistent(a,b);
-        if (this.status == 2) {
-            this.status = 0;
-            return;
-        }
-        if (this.cinema[a-1][b-1] == 'X') {
-            this.saveLocation(a,b,1);
-            this.cinema[a-1][b-1] = 'O';
+    refund(row, col) {
+        if (!this.nonExistent(row, col)) return;
+        if (this.cinema[row-1][col-1] == 'X') {
+            this.cinema[row-1][col-1] = 'O';
+            this.saveLocation(row,col,1);
         } else {
-            console.log('该座位未售出');
+            console.log('该座位还未售出');
         }
     }
     print() {
-        let shouHou = '';
-        for (let j = 0; j < this.cinema.length; j++) {
-            this.buys = shouHou += this.cinema[j] + '\n';
-        }
-        console.log(this.buys);
+        console.log(this.cinema.map((item) => item.join()).join("\n"));
     }
-    listorder() {
-        for (let i = 0; i < this.movieTicketRecords.length; i++) {
-            let url = this.movieTicketRecords[i].time + ' row ' + this.movieTicketRecords[i].row + ' column ' + this.movieTicketRecords[i].column;
-            if (this.movieTicketRecords[i].status == 0) {
-                console.log(url);
-            } else {
-                console.log(url + ' refund');
-            }
-        }
+    listOrder() {
+        this.record.forEach((item) => {
+            console.log(`${item.time} row ${item.row} column ${item.col} ${item.status === 1 ? 'refund' : '' }`)
+        })
     }
     // 获取当前时间
     getTime() {
@@ -84,10 +85,23 @@ class Cinema {
         this.times = year + month + day + time;
     }
 }
-var arr = new Cinema();
-arr.init(5, 10);
-arr.sell(4,6);
-arr.print();
-arr.refund(4,6);
-arr.print();
-arr.listorder();
+var sell = new Cinema();
+sell.init(5, 10);
+console.log('第1波测试：测试有效的座位号\n');
+sell.sell(6, 10);
+
+
+console.log('\n第2波测试：重复售出座位号\n');
+sell.sell(2, 3);
+sell.print();
+sell.sell(2, 3);
+
+sell.sell(1, 2);
+sell.refund(1, 2);
+
+console.log('\n第3波测试：未出售的座位号出售\n');
+sell.refund(4, 6);
+
+console.log('\n第4波测试：列出左右的售票记录\n');
+sell.listOrder();
+sell.print();
