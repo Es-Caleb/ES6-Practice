@@ -3,7 +3,6 @@ class Cinema {
         this.x = 5;
         this.y = 10;
         this.cinema = [];
-        this.status = 0;
         this.movieTicketRecords = [];
     }
     init(x,y) {
@@ -28,7 +27,6 @@ class Cinema {
     // 座位不存在
     nonExistent(a,b) {
         if ( a <= 0 || a > this.x || b <= 0 || b > this.y ) {
-            this.status = 2;
             console.log('不存在该座位');
             return;
         }
@@ -46,7 +44,6 @@ class Cinema {
             this.saveLocation(a,b,1);
             this.cinema[a-1][b-1] = 'O';
         } else {
-            this.status = 2;
             console.log('该座位未售出');
         }
     }
@@ -58,9 +55,6 @@ class Cinema {
         console.log(this.buys);
     }
     listorder() {
-        if (this.status == 2) {
-            return;
-        }
         for (let i = 0; i < this.movieTicketRecords.length; i++) {
             let url = this.movieTicketRecords[i].time + ' row ' + this.movieTicketRecords[i].row + ' column ' + this.movieTicketRecords[i].column;
             if (this.movieTicketRecords[i].status == 0) {
@@ -70,7 +64,6 @@ class Cinema {
             }
         }
     }
-
     // 获取当前时间
     getTime() {
         let date = new Date();
@@ -86,7 +79,6 @@ var arr = new Cinema();
 arr.init(5, 10);
 arr.sell(4,6);
 arr.print();
-arr.listorder();
 arr.refund(4,6);
 arr.print();
 arr.listorder();
